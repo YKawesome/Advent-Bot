@@ -96,8 +96,10 @@ def get_discord_ids_completed_challenge(leaderboard: dict, mapping: dict) -> lis
     discord_ids = []
     for advent_id in leaderboard['members']:
         if _get_user_completed_today(leaderboard, advent_id):
-            if mapping[advent_id] is not None:
+            try:
                 discord_ids.append(mapping[advent_id])
+            except KeyError:
+                pass
     return discord_ids
 
 
@@ -106,8 +108,10 @@ def get_discord_ids_not_completed_challenge(leaderboard: dict, mapping: dict) ->
     discord_ids = []
     for advent_id in leaderboard['members']:
         if not _get_user_completed_today(leaderboard, advent_id):
-            if mapping[advent_id] is not None:
+            try:
                 discord_ids.append(mapping[advent_id])
+            except KeyError:
+                pass
     return discord_ids
 
 
@@ -116,7 +120,9 @@ def get_discord_ids_completed_challenge_sorted(leaderboard: dict, mapping: dict)
     last_star_ts = []
     for advent_id in leaderboard['members']:
         if _get_user_completed_today(leaderboard, advent_id):
-            if mapping[advent_id] is not None:
+            try:
                 last_star_ts.append((mapping[advent_id], leaderboard['members'][advent_id]['last_star_ts']))
+            except KeyError:
+                pass
     last_star_ts.sort(key=lambda x: x[1])
     return [x[0] for x in last_star_ts]
