@@ -27,10 +27,18 @@ def get_test_json() -> dict:
     return dict(json.loads(f.read()))
 
 
-def get_mapping_json(guild_id: str) -> dict:
+def get_mapping_json(guild_id: str) -> dict | None:
     '''Returns the mapping JSON as a dict.'''
+    all_mapping = get_entire_mapping()
+    if guild_id not in all_mapping:
+        return None
+    return dict(all_mapping[guild_id])
+
+
+def get_entire_mapping() -> dict:
+    '''Returns the entire mapping JSON as a dict.'''
     f = open('json/mapping.json', 'r')
-    return dict(json.loads(f.read()))[guild_id]
+    return dict(json.loads(f.read()))
 
 
 def _get_day() -> int:
@@ -126,3 +134,14 @@ def get_discord_ids_completed_challenge_sorted(leaderboard: dict, mapping: dict)
                 pass
     last_star_ts.sort(key=lambda x: x[1])
     return [x[0] for x in last_star_ts]
+
+
+def add_mapping(guild_id: str, nickname: str, advent_id: str, member: discord.Member) -> None:
+    '''Adds a mapping to the mapping JSON.'''
+    mapping = get_mapping_json(guild_id)
+    mapping[nickname] = 'Comment'
+    mapping[advent_id] = member.id
+    all_mapping = get_entire_mapping()
+    all_mapping[guild_id] = mapping
+    json.dump(all_mapping, open('json/output.json', 'w'))
+

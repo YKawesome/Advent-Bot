@@ -41,6 +41,11 @@ class ADVENT(commands.Cog, description='Event Handlers'):
         embed = ar.get_stats_embed(leaderboard, interaction.guild)
         await interaction.response.send_message(embed=embed)
 
+    @app_commands.command(name='add_mapping', description='Add a mapping between an Advent of Code ID and a Discord ID.')
+    async def add_mapping(self, interaction: discord.Interaction, nickname: str, advent_id: str):
+        ar.add_mapping(str(interaction.guild.id), nickname, advent_id, interaction.user)
+        await interaction.response.send_message(f'Added mapping between {advent_id} and {interaction.user}.')
+
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(ADVENT(bot))
