@@ -4,6 +4,7 @@ import json
 from datetime import datetime
 import pytz
 import discord
+from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -70,7 +71,12 @@ def get_stats_string(leaderboard: dict) -> str:
 
 def get_stats_embed(leaderboard: dict, guild: discord.Guild) -> discord.Embed:
     '''Returns the stats embed on who has completed today's challenge.'''
-    embed = discord.Embed(title='Today\'s Challenge', description='Who has completed today\'s challenge?', color=0xffff69)
+    try:
+        title = get_day_title()
+    except Exception:
+        title = f'Day {_get_day()}'
+
+    embed = discord.Embed(title=title, description='Who has completed today\'s challenge?', color=0xffff69)
 
     completed_str = ''
     i = 0
@@ -144,3 +150,25 @@ def add_mapping(guild_id: str, nickname: str, advent_id: str, member: discord.Me
     all_mapping = get_entire_mapping()
     all_mapping[guild_id] = mapping
     json.dump(all_mapping, open('json/mapping.json', 'w'))
+
+
+def remove_mapping(guild_id: str, nickname: str, advent_id: str) -> None:
+    '''Removes a mapping from the mapping JSON.'''
+    mapping = get_mapping_json(guild_id)
+    del mapping[nickname]
+    del mapping[advent_id]
+    all_mapping = get_entire_mapping()
+    all_mapping[guild_id] = mapping
+    json.dump(all_mapping, open('json/mapping.json', 'w'))
+
+
+def get_day_title() -> str:
+    '''Returns the title of the current day.'''
+    url = f'https://adventofcode.com/2023/day/{_get_day()}'
+    request = urllib.request.Request(url)
+    request.add_header('Cookie', f'session={_SESSION_COOKIE}')
+    response = urllib.request.urlopen(request)
+    soup = BeautifulSoup(response.read(), 'html.parser')
+    ret = soup.find('h2').text
+    ret = ret.lstrip('--- ').rstrip(' ---')
+    return ret

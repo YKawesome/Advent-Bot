@@ -47,6 +47,12 @@ class ADVENT(commands.Cog, description='Event Handlers'):
         ar.add_mapping(str(interaction.guild.id), nickname, advent_id, member)
         await interaction.response.send_message(f'Added mapping between {advent_id} and {member.mention}.')
 
+    @app_commands.checks.has_permissions(administrator=True)
+    @app_commands.command(name='remove_mapping', description='Remove a mapping between an Advent of Code ID and a Discord ID.')
+    async def remove_mapping(self, interaction: discord.Interaction, nickname: str, advent_id: str):
+        ar.remove_mapping(str(interaction.guild.id), nickname, advent_id)
+        await interaction.response.send_message(f'Removed mapping for {nickname}.')
+
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(ADVENT(bot))
