@@ -58,6 +58,14 @@ def _get_user_completed_today(leaderboard: dict, user_id: str) -> bool:
     return False
 
 
+def _get_user_completed_today_part1(leaderboard: dict, user_id: str) -> bool:
+    '''Returns whether or not the user has completed today's challenge.'''
+    if str(_get_day()) in leaderboard['members'][user_id]['completion_day_level']:
+        if "1" in leaderboard['members'][user_id]['completion_day_level'][str(_get_day())]:
+            return True
+    return False
+
+
 def get_stats_string(leaderboard: dict) -> str:
     '''Returns the stats string on who has completed today's challenge.'''
     string = ''
@@ -93,13 +101,25 @@ def get_stats_embed(leaderboard: dict, guild: discord.Guild) -> discord.Embed:
         i += 1
     embed.add_field(name='Completed', value=completed_str, inline=False)
 
+    completed_part1_str = ''
+    for id in get_discord_ids_completed_challenge_part1(leaderboard, get_mapping_json(str(guild.id))):
+        try:
+            member = guild.get_member(id).mention
+        except AttributeError:
+            member = id
+        if id not in get_discord_ids_completed_challenge(leaderboard, get_mapping_json(str(guild.id))):
+            completed_part1_str += f'{member}\n'
+    if completed_part1_str != '':
+        embed.add_field(name='Completed Part 1', value=completed_part1_str, inline=False)
+
     not_completed_str = ''
     for id in get_discord_ids_not_completed_challenge(leaderboard, get_mapping_json(str(guild.id))):
         try:
             member = guild.get_member(id).mention
         except AttributeError:
             member = id
-        not_completed_str += f'{member}\n'
+        if id not in get_discord_ids_completed_challenge_part1(leaderboard, get_mapping_json(str(guild.id))):
+            not_completed_str += f'{member}\n'
     embed.add_field(name='Not Completed', value=not_completed_str, inline=False)
 
     return embed
@@ -110,6 +130,18 @@ def get_discord_ids_completed_challenge(leaderboard: dict, mapping: dict) -> lis
     discord_ids = []
     for advent_id in leaderboard['members']:
         if _get_user_completed_today(leaderboard, advent_id):
+            try:
+                discord_ids.append(mapping[advent_id])
+            except KeyError:
+                pass
+    return discord_ids
+
+
+def get_discord_ids_completed_challenge_part1(leaderboard: dict, mapping: dict) -> list:
+    '''Returns a list of discord ids of people who have completed today's challenge.'''
+    discord_ids = []
+    for advent_id in leaderboard['members']:
+        if _get_user_completed_today_part1(leaderboard, advent_id):
             try:
                 discord_ids.append(mapping[advent_id])
             except KeyError:
