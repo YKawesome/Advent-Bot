@@ -143,5 +143,4 @@ def add_mapping(guild_id: str, nickname: str, advent_id: str, member: discord.Me
     mapping[advent_id] = member.id
     all_mapping = get_entire_mapping()
     all_mapping[guild_id] = mapping
-    json.dump(all_mapping, open('json/output.json', 'w'))
-
+    json.dump(all_mapping, open('json/mapping.json', 'w'))
