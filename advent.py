@@ -9,6 +9,7 @@ load_dotenv()
 
 
 _SNOOP_GUILD = os.getenv('WALTER_GUILD')
+_ROBO_GUILD = os.getenv('ROBO_GUILD')
 
 
 class ADVENT(commands.Cog, description='Event Handlers'):
@@ -39,6 +40,8 @@ class ADVENT(commands.Cog, description='Event Handlers'):
     async def stats_embed(self, interaction: discord.Interaction):
         leaderboard = ar.get_leaderboard_json(str(interaction.guild.id))
         embed = ar.get_stats_embed(leaderboard, interaction.guild)
+        if interaction.guild.id == int(_ROBO_GUILD):
+            embed.set_footer(text='jeremy has already completed all the challenges.')
         await interaction.response.send_message(embed=embed)
 
     @app_commands.checks.has_permissions(administrator=True)

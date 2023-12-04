@@ -46,7 +46,7 @@ def _get_day() -> int:
     '''Returns the current day in EST.'''
     now_utc = datetime.utcnow()
     est_timezone = pytz.timezone('America/New_York')
-    now_est = now_utc.astimezone(est_timezone)
+    now_est = est_timezone.fromutc(now_utc)
     return now_est.day
 
 
