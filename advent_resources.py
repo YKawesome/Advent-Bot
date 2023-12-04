@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-_NUMS = ['first_place', 'second_place', 'third_place', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten']
+_NUMS = ['first_place', 'second_place', 'third_place', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'keycap_ten']
 _SESSION_COOKIE = os.getenv('SESSION_COOKIE')
 
 
@@ -204,3 +204,37 @@ def get_day_title() -> str:
     ret = soup.find('h2').text
     ret = ret.lstrip('--- ').rstrip(' ---')
     return ret
+
+
+def get_num_stars(leaderboard: dict, advent_id: str) -> int:
+    '''Returns the number of stars a user has.'''
+    return int(leaderboard['members'][advent_id]['stars'])
+
+
+def get_points(leaderboard: dict, advent_id: str) -> int:
+    '''Returns the number of points a user has.'''
+    return int(leaderboard['members'][advent_id]['local_score'])
+
+
+def get_leaderboard_embed(leaderboard: dict, guild: discord.Guild) -> discord.Embed:
+    '''Returns the leaderboard embed.'''
+    lboard = []
+    for advent_id in leaderboard['members']:
+        try:
+            member = guild.get_member(get_mapping_json(str(guild.id))[advent_id]).mention
+        except AttributeError:
+            member = get_mapping_json(str(guild.id))[advent_id]
+        stars = get_num_stars(leaderboard, advent_id)
+        points = get_points(leaderboard, advent_id)
+        lboard.append((member, stars, points))
+    lboard.sort(key=lambda x: (x[2], x[1]), reverse=True)
+    string = ''
+    for i in range(len(lboard)):
+        string += f':{_NUMS[i]}: {lboard[i][0]}\n**{lboard[i][2]} points**\n{":star:" * lboard[i][1]} ({lboard[i][1]})\n\n'
+        if i == 2:
+            string = string.rstrip('\n\n')
+            string += '\n----------------\n\n'
+        if i == 7:
+            break
+    embed = discord.Embed(title='Leaderboard', description=string, color=0xffff69)
+    return embed

@@ -56,6 +56,12 @@ class ADVENT(commands.Cog, description='Event Handlers'):
         ar.remove_mapping(str(interaction.guild.id), nickname, advent_id)
         await interaction.response.send_message(f'Removed mapping for {nickname}.')
 
+    @app_commands.command(name='get_leaderboard', description='Get the current leaderboard')
+    async def get_leaderboard(self, interaction: discord.Interaction):
+        leaderboard = ar.get_leaderboard_json(str(interaction.guild.id))
+        embed = ar.get_leaderboard_embed(leaderboard, interaction.guild)
+        await interaction.response.send_message(embed=embed)
+
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(ADVENT(bot))
