@@ -15,6 +15,13 @@ This command pulls a very rudimentary string list of which AOC leaders in the cu
 
 It is more generally used as a backup for /stats_embed since it lacks much more of the functionality.
 
+## /get_leaderboard
+Gets the top 8 members of the current server on the private advent leaderboard for that server, and sorts by points. This also shows the *total* number of stars earned by each person.
+
+<img width="386" alt="Screenshot 2023-12-03 at 10 31 28 PM" src="https://github.com/YKawesome/Advent-Bot/assets/72176181/e9ad8264-029b-437b-bcde-d1ae5d5e3435">
+
+All data is taken easily from the json provided by AoC for the private leaderboard.
+
 ## /add_mapping and /remove_mapping
 These commands are used to map or remove a mapping of a discord user to an advent id; you pass in a mention to a user to the command and a nickname, and you must manually find their AOC id (there isn't a better way to do this since it cannot know who is who).
 
