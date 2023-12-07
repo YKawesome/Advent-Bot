@@ -216,6 +216,25 @@ def get_points(leaderboard: dict, advent_id: str) -> int:
     return int(leaderboard['members'][advent_id]['local_score'])
 
 
+def get_user_day_string(leaderboard: dict, advent_id: str) -> str:
+    '''Returns the string of the user's day.'''
+    completion_levels = [member['completion_day_level'].keys() for member in leaderboard['members'].values()]
+    completion_levels = list(map(lambda x: [int(y) for y in x], completion_levels))
+    highest_completion_level = max([max(x) for x in completion_levels if len(x) > 0])
+
+    string = ''
+    for i in range(1, highest_completion_level + 1):
+        comp_day_level = leaderboard['members'][advent_id]['completion_day_level']
+        if str(i) in comp_day_level:
+            if '2' in comp_day_level[str(i)]:
+                string += ':star:'
+            elif '1' in comp_day_level[str(i)]:
+                string += '<:silverstar:1182302933350621277>'
+        else:
+            string += ':heavy_multiplication_x:'
+    return string
+
+
 def get_leaderboard_embed(leaderboard: dict, guild: discord.Guild) -> discord.Embed:
     '''Returns the leaderboard embed.'''
     lboard = []
@@ -226,11 +245,11 @@ def get_leaderboard_embed(leaderboard: dict, guild: discord.Guild) -> discord.Em
             member = get_mapping_json(str(guild.id))[advent_id]
         stars = get_num_stars(leaderboard, advent_id)
         points = get_points(leaderboard, advent_id)
-        lboard.append((member, stars, points))
+        lboard.append((member, stars, points, advent_id))
     lboard.sort(key=lambda x: (x[2], x[1]), reverse=True)
     string = ''
     for i in range(len(lboard)):
-        string += f':{_NUMS[i]}: {lboard[i][0]}\n**{lboard[i][2]} points**\n{":star:" * lboard[i][1]} ({lboard[i][1]})\n\n'
+        string += f':{_NUMS[i]}: {lboard[i][0]}\n**{lboard[i][2]} points**\n{get_user_day_string(leaderboard, lboard[i][3])} ({lboard[i][1]})\n\n'
         if i == 2:
             string = string.rstrip('\n\n')
             string += '\n----------------\n\n'
