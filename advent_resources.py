@@ -121,7 +121,7 @@ def get_stats_embed(leaderboard: dict, guild: discord.Guild) -> discord.Embed:
         if id not in get_discord_ids_completed_challenge_part1(leaderboard, get_mapping_json(str(guild.id))):
             not_completed_str += f'{member}\n'
     embed.add_field(name='Not Completed', value=not_completed_str, inline=False)
-
+    embed = embed.set_footer(text='a bot by yousef :D')
     return embed
 
 
@@ -266,6 +266,7 @@ def get_leaderboard_embed(leaderboard: dict, guild: discord.Guild) -> discord.Em
         if i == 7:
             break
     embed = discord.Embed(title='Leaderboard', description=string, color=0xffff69)
+    embed = embed.set_footer(text='a bot by yousef :D')
     return embed
 
 
@@ -290,4 +291,5 @@ def get_leaderboard_stars_per_day(leaderboard: dict, guild: discord.Guild, place
             string += f"{get_user_day_string(leaderboard, item[3], fill_to=20)} {item[0]}\n"
 
     embed = discord.Embed(title='Star Leaderboard', description=string, color=0xffff69)
+    embed = embed.set_footer(text='a bot by yousef :D')
     return embed
