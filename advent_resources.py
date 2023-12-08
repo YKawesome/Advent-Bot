@@ -287,7 +287,7 @@ def get_leaderboard_stars_per_day(leaderboard: dict, guild: discord.Guild, place
     string += f'{(":one::two::three::four::five::six::seven::eight::nine::zero:" * 2)}\n'
     for i, item in enumerate(lboard, start=1):
         if i in places:
-            string += f"{get_user_day_string(leaderboard, item[3], fill_to=20)} {item[0]} **{item[2]}**\n"
+            string += f"{get_user_day_string(leaderboard, item[3], fill_to=20)} {item[0]}\n"
 
     embed = discord.Embed(title='Star Leaderboard', description=string, color=0xffff69)
     return embed
