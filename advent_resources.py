@@ -216,11 +216,17 @@ def get_points(leaderboard: dict, advent_id: str) -> int:
     return int(leaderboard['members'][advent_id]['local_score'])
 
 
-def get_user_day_string(leaderboard: dict, advent_id: str) -> str:
-    '''Returns the string of the user's day.'''
+def get_highest_completion_level(leaderboard: dict) -> int:
+    '''Returns the highest completion level of the leaderboard.'''
     completion_levels = [member['completion_day_level'].keys() for member in leaderboard['members'].values()]
     completion_levels = list(map(lambda x: [int(y) for y in x], completion_levels))
     highest_completion_level = max([max(x) for x in completion_levels if len(x) > 0])
+    return highest_completion_level
+
+
+def get_user_day_string(leaderboard: dict, advent_id: str, fill_to: int = 0) -> str:
+    '''Returns the string of the user's day.'''
+    highest_completion_level = get_highest_completion_level(leaderboard)
 
     string = ''
     for i in range(1, highest_completion_level + 1):
@@ -232,6 +238,8 @@ def get_user_day_string(leaderboard: dict, advent_id: str) -> str:
                 string += '<:silverstar:1182302933350621277>'
         else:
             string += ':heavy_multiplication_x:'
+    if fill_to > 0:
+        string += ':heavy_multiplication_x:' * (fill_to - highest_completion_level)
     return string
 
 
@@ -243,6 +251,8 @@ def get_leaderboard_embed(leaderboard: dict, guild: discord.Guild) -> discord.Em
             member = guild.get_member(get_mapping_json(str(guild.id))[advent_id]).mention
         except AttributeError:
             member = get_mapping_json(str(guild.id))[advent_id]
+        except KeyError:
+            member = leaderboard['members'][advent_id]['name']
         stars = get_num_stars(leaderboard, advent_id)
         points = get_points(leaderboard, advent_id)
         lboard.append((member, stars, points, advent_id))
@@ -256,4 +266,28 @@ def get_leaderboard_embed(leaderboard: dict, guild: discord.Guild) -> discord.Em
         if i == 7:
             break
     embed = discord.Embed(title='Leaderboard', description=string, color=0xffff69)
+    return embed
+
+
+def get_leaderboard_stars_per_day(leaderboard: dict, guild: discord.Guild, places: range) -> discord.Embed:
+    '''Returns a leaderboard with days at the top, users on the left, and stars in the middle.'''
+    lboard = []
+    for advent_id in leaderboard['members']:
+        try:
+            member = guild.get_member(get_mapping_json(str(guild.id))[advent_id]).mention
+        except AttributeError:
+            member = get_mapping_json(str(guild.id))[advent_id]
+        except KeyError:
+            member = leaderboard['members'][advent_id]['name']
+        stars = get_num_stars(leaderboard, advent_id)
+        points = get_points(leaderboard, advent_id)
+        lboard.append((member, stars, points, advent_id))
+    lboard.sort(key=lambda x: (x[1], x[2]), reverse=True)
+    string = f'{"." * (6 * 8)}{":one:" * 10}{":two:"}\n'
+    string += f'{(":one::two::three::four::five::six::seven::eight::nine::zero:" * 2)}\n'
+    for i, item in enumerate(lboard, start=1):
+        if i in places:
+            string += get_user_day_string(leaderboard, item[3], fill_to=20) + ' ' + item[0] + '\n'
+
+    embed = discord.Embed(title='Star Leaderboard', description=string, color=0xffff69)
     return embed

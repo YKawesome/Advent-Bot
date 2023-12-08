@@ -62,6 +62,12 @@ class ADVENT(commands.Cog, description='Event Handlers'):
         embed = ar.get_leaderboard_embed(leaderboard, interaction.guild)
         await interaction.response.send_message(embed=embed)
 
+    @app_commands.command(name='get_leaderboard_stars', description='Get the current leaderboard stars (no points)')
+    async def get_leaderboard_stars(self, interaction: discord.Interaction):
+        leaderboard = ar.get_leaderboard_json(str(interaction.guild.id))
+        embed = ar.get_leaderboard_stars_per_day(leaderboard, interaction.guild, range(1, 9))
+        await interaction.response.send_message(embed=embed)
+
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(ADVENT(bot))
