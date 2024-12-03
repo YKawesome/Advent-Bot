@@ -16,10 +16,11 @@ _SESSION_COOKIE = os.getenv('SESSION_COOKIE')
 def get_leaderboard_json(guild_id: str) -> dict:
     '''Returns the leaderboard JSON as a dict.'''
     leaderboard_id = get_mapping_json(guild_id)['leaderboard_id']
-    request = urllib.request.Request(f'https://adventofcode.com/2023/leaderboard/private/view/{leaderboard_id}.json')
+    request = urllib.request.Request(f'https://adventofcode.com/2024/leaderboard/private/view/{leaderboard_id}.json')
     request.add_header('Cookie', f'session={_SESSION_COOKIE}')
     response = urllib.request.urlopen(request)
-    return dict(json.loads(response.read().decode('utf-8')))
+    decoded = response.read().decode('utf-8')
+    return dict(json.loads(decoded))
 
 
 def get_test_json() -> dict:
@@ -196,7 +197,7 @@ def remove_mapping(guild_id: str, nickname: str, advent_id: str) -> None:
 
 def get_day_title() -> str:
     '''Returns the title of the current day.'''
-    url = f'https://adventofcode.com/2023/day/{_get_day()}'
+    url = f'https://adventofcode.com/2024/day/{_get_day()}'
     request = urllib.request.Request(url)
     request.add_header('Cookie', f'session={_SESSION_COOKIE}')
     response = urllib.request.urlopen(request)
